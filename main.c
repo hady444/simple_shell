@@ -7,11 +7,6 @@
  */
 int main(__attribute__ ((unused)) int argc, char **argv)
 {
-	char *path;
-
-	/*path = malloc(sizeof(char) * 1024);*/
-	_getenv("PATH", &path);
-	loop_shell(&path, argv);
-	free(path);
+	loop_shell(argv);
 	return (0);
 }

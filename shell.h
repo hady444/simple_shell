@@ -26,9 +26,10 @@ void print_error(char *arg1, char *number, char *arg3);
 char *get_command(char *path, char *cmd, struct stat *st);
 void _printenv(void);
 char **copy_env();
-void loop_shell(char **path, char **argv);
-void handel_path(char *args[], char **path, char **argv, char **command);
-void with_path(char *args[], char **path, char **argv, char **command);
+void loop_shell(char **argv);
+void handel_path(char *args[], char **argv, char **command);
+void with_path(char *args[], char **path, char **path1, char **argv,
+char **command);
 int str_len(char *s);
 char *str_cpy(char *dest, char *source);
 int str_cmp(char *s1, char *s2);
@@ -36,5 +37,6 @@ int str_cmpc(char *s1, const char *s2);
 char *str_cat(char *dest, char *src);
 char *str_dup(char *str);
 int handel_comments(char **token);
-void tokenization(char *args[], char **path, char *argv[], char **command);
+void tokenization(char *args[], char *argv[], char **command);
+int check_empty_env(void);
 #endif

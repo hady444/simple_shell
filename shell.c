@@ -1,11 +1,10 @@
 #include "shell.h"
 /**
  * loop_shell - our shell
- * @path: address of environment path
  * @argv: arguments passef in main
  *
  */
-void loop_shell(char **path, char **argv)
+void loop_shell(char **argv)
 {
 	char *command, *args[1024];
 	size_t cmd_len = 0;
@@ -23,7 +22,7 @@ void loop_shell(char **path, char **argv)
 		{
 			if (isatty(STDIN_FILENO))
 				write(STDOUT_FILENO, "\n", 1);
-			free(*path), free(command), exit(0);
+			free(command), exit(0);
 		}
 		if (str_cmp(command, "\n") == 0)
 		{
@@ -31,22 +30,30 @@ void loop_shell(char **path, char **argv)
 			continue;
 		}
 		command[cmd_size - 1] = '\0';
-		tokenization(args, path, argv, &command), free(command);
+		tokenization(args, argv, &command), free(command);
 	}
 }
 /**
  * handel_path - handeling path of environment
  * @args: arguments tokinized
- * @path: address of environment path
  * @argv: arguments passef in main
  * @command: firstly made command to be freed
  */
-void handel_path(char *args[], char **path, char **argv, char **command)
+void handel_path(char *args[], char **argv, char **command)
 {
 	struct stat st;
 	pid_t p;
 	int status;
+	char *path;
+	char *path1;
 
+	_getenv("PATH1", &path1);
+	_getenv("PATH", &path);
+	if (path1 && !path)
+	{
+		with_path(args, &path, &path1, argv, command), free(path), free(path1);
+		return;
+	}
 	if (stat(args[0], &st) == 0)
 	{
 		p = fork();
@@ -54,28 +61,31 @@ void handel_path(char *args[], char **path, char **argv, char **command)
 		{
 			execve(args[0], args, environ);
 			perror(argv[0]);
+			free(path), free(path1);
 			exit(EXIT_FAILURE);
 		}
 		else if (p > 0)
-			wait(&status);
+			wait(&status), free(path), free(path1);
 		else
 		{
-			perror("fork"), exit(EXIT_FAILURE);
+			perror("fork"), free(path), free(path1), exit(EXIT_FAILURE);
 		}
 	}
 	else
 	{
-		with_path(args, path, argv, command);
+		with_path(args, &path, &path1, argv, command), free(path), free(path1);
 	}
 }
 /**
  * with_path - handeling path of environment
  * @args: arguments tokinized
- * @path: address of environment path
+ * @path: paht in environment
+ * @path1: another paht in environment
  * @argv: arguments passef in main
  * @command: firstly made command to be freed
  */
-void with_path(char *args[], char **path, char **argv, char **command)
+void with_path(char *args[], char **path, char **path1, char **argv,
+char **command)
 {
 	char *cmd_1st, *number;
 	struct stat st;
@@ -102,9 +112,7 @@ void with_path(char *args[], char **path, char **argv, char **command)
 			free(cmd_1st);
 		}
 		else
-		{
 			perror("fork"), free(cmd_1st), exit(EXIT_FAILURE);
-		}
 	}
 	else
 	{
@@ -113,7 +121,7 @@ void with_path(char *args[], char **path, char **argv, char **command)
 		err_num++, free(number), free(cmd_1st);
 		if (!isatty(STDIN_FILENO))
 		{
-			free(*path), free(*command), exit(127);
+			free(*path), free(*path1), free(*command), exit(127);
 		}
 	}
 }
