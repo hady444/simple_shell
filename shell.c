@@ -2,13 +2,14 @@
 /**
  * loop_shell - our shell
  * @argv: arguments passef in main
- *
+ * @status: status code
  */
-void loop_shell(char **argv)
+void loop_shell(char **argv, int *status)
 {
 	char *command, *args[1024];
 	size_t cmd_len = 0;
 	ssize_t cmd_size;
+	int re;
 
 	while (1)
 	{
@@ -30,7 +31,13 @@ void loop_shell(char **argv)
 			continue;
 		}
 		command[cmd_size - 1] = '\0';
-		tokenization(args, argv, &command), free(command);
+		re = tokenization(args, argv, &command, status);
+		if (re == 1)
+		{
+			free(command);
+			return;
+		}
+		free(command);
 	}
 }
 /**
@@ -38,12 +45,12 @@ void loop_shell(char **argv)
  * @args: arguments tokinized
  * @argv: arguments passef in main
  * @command: firstly made command to be freed
+ * @status: status code
  */
-void handel_path(char *args[], char **argv, char **command)
+void handel_path(char *args[], char **argv, char **command, int *status)
 {
 	struct stat st;
 	pid_t p;
-	int status;
 	char *path;
 	char *path1;
 
@@ -51,7 +58,8 @@ void handel_path(char *args[], char **argv, char **command)
 	_getenv("PATH", &path);
 	if (path1 && !path)
 	{
-		with_path(args, &path, &path1, argv, command), free(path), free(path1);
+		with_path(args, &path, &path1, argv, command, status), free(path);
+		free(path1);
 		return;
 	}
 	if (stat(args[0], &st) == 0)
@@ -62,18 +70,19 @@ void handel_path(char *args[], char **argv, char **command)
 			execve(args[0], args, environ);
 			perror(argv[0]);
 			free(path), free(path1);
-			exit(EXIT_FAILURE);
+			exit(2);
 		}
 		else if (p > 0)
-			wait(&status), free(path), free(path1);
+			wait(status), free(path), free(path1);
 		else
 		{
-			perror("fork"), free(path), free(path1), exit(EXIT_FAILURE);
+			perror("fork"), free(path), free(path1), exit(1);
 		}
 	}
 	else
 	{
-		with_path(args, &path, &path1, argv, command), free(path), free(path1);
+		with_path(args, &path, &path1, argv, command, status), free(path);
+		free(path1);
 	}
 }
 /**
@@ -83,13 +92,14 @@ void handel_path(char *args[], char **argv, char **command)
  * @path1: another paht in environment
  * @argv: arguments passef in main
  * @command: firstly made command to be freed
+ * @status: status code
  */
 void with_path(char *args[], char **path, char **path1, char **argv,
-char **command)
+char **command, int *status)
 {
 	char *cmd_1st, *number;
 	struct stat st;
-	int status;
+	/*int status;*/
 	pid_t p;
 	static int err_num = 1;
 
@@ -104,15 +114,15 @@ char **command)
 			execve(cmd_1st, args, environ);
 			perror(argv[0]);
 			free(cmd_1st);
-			exit(EXIT_FAILURE);
+			exit(2);
 		}
 		else if (p > 0)
 		{
-			wait(&status);
+			wait(status);
 			free(cmd_1st);
 		}
 		else
-			perror("fork"), free(cmd_1st), exit(EXIT_FAILURE);
+			perror("fork"), free(cmd_1st), exit(1);
 	}
 	else
 	{

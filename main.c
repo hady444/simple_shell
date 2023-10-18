@@ -7,6 +7,8 @@
  */
 int main(__attribute__ ((unused)) int argc, char **argv)
 {
-	loop_shell(argv);
-	return (0);
+	int status = 0;
+
+	loop_shell(argv, &status);
+	return (status);
 }

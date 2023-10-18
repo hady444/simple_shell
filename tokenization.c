@@ -4,8 +4,10 @@
  * @args: pointer to array to save each token in
  * @argv: arguments in main
  * @command: commands passed
+ * @status: status code
+ * Return: 1 if there exit command
  */
-void tokenization(char *args[], char *argv[], char **command)
+int tokenization(char *args[], char *argv[], char **command, int *status)
 {
 	const char *delim = " \t\n\"";
 	char *token;
@@ -26,8 +28,17 @@ void tokenization(char *args[], char *argv[], char **command)
 		free(token);
 	args[i] = NULL;
 	if (!args[0])
-		return;
+		return (1);
 	if (str_cmp(args[0], "exit") == 0)
-		free(*command), exit(0);
-	handel_path(args, argv, command);
+	{
+		exit_me(status);
+		return (1);
+	}
+	else if (str_cmp(args[0], "env") == 0)
+	{
+		_printenv();
+		return (0);
+	}
+	handel_path(args, argv, command, status);
+	return (0);
 }
