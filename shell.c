@@ -38,9 +38,18 @@ void loop_shell(char **path, char **argv)
 			free(command), free(token), free(*path), exit(0);
 		i = 0;
 		while (token)
-			args[i] = token, token = strtok(NULL, delim), i++;
-		free(token);
+		{
+			if (handel_comments(&token) == 1)
+				args[i] = token, token = strtok(NULL, delim), i++;
+			else
+				break;
+		}
+		if (!token)
+			free(token);
 		args[i] = NULL;
+		/*j = 0;
+		for (;args[j] != NULL; j++)
+			printf("%s\n", args[j]);*/
 		if (str_cmp(args[0], "exit") == 0)
 			free(path), exit(0);
 		handel_path(args, path, argv, &command), free(command);

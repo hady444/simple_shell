@@ -35,4 +35,5 @@ int str_cmp(char *s1, char *s2);
 int str_cmpc(char *s1, const char *s2);
 char *str_cat(char *dest, char *src);
 char *str_dup(char *str);
+int handel_comments(char **token);
 #endif
