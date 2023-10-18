@@ -1,6 +1,6 @@
 #include "shell.h"
 /**
- * handel_comments - handel # 
+ * handel_comments - handel #
  * @args: command arguments
  */
 int handel_comments(char **token)
