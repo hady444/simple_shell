@@ -1,7 +1,8 @@
 #include "shell.h"
 /**
  * handel_comments - handel #
- * @args: command arguments
+ * @token: token passed
+ * Return: 1 On no comment 0 if comment (#) found
  */
 int handel_comments(char **token)
 {

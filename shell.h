@@ -36,4 +36,5 @@ int str_cmpc(char *s1, const char *s2);
 char *str_cat(char *dest, char *src);
 char *str_dup(char *str);
 int handel_comments(char **token);
+void tokenization(char *args[], char **path, char *argv[], char **command);
 #endif
